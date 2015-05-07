@@ -4,11 +4,33 @@ Script to create diary annotations and explore, visualize and mantain copies of
 them. It is possible to create as many diaries as desired and every day is
 stored in an individual text-file.
 
-All the diaries are stored in "~/diary/" and separated folders per each diary
-name. However, it is possible to change the paths.
+(It has been tried in Ubuntu and Debian)
 
-By default the text editor is vim and for nice visualization of the diary it is
-recommended to use markdown syntax.
+All the diaries are stored in "~/diary/" and separated folders per each diary
+name.
+
+```bash
+DIARY_PATH="${HOME}/diary"
+```
+
+By default the text editor is vim.
+
+```bash
+EDITOR="vim + "
+```
+
+For nice visualization of the diary in the web-browser it is recommended to use
+markdown syntax. The default web-browser is the default in Ubuntu.
+
+```bash
+EXPLORER="sensible-browser"
+```
+
+In other Operating Systems you could choose any other web-browser (e.g. firefox).
+
+```bash
+EXPLORER="firefox"
+```
 
 Show the help
 -------------
