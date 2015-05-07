@@ -1,0 +1,152 @@
+#!/bin/bash
+#title          :diary
+#description    :Script to manage diary annotations of different projects
+#                or personal notes. It allows to search sentences in all the
+#                diaries, visualize in a web-browser, and maintain a control
+#                version.
+#author         :Miquel Perello Nieto
+#date           :20150507
+#version        :0.4
+#usage          :diary nameofthediary
+#notes          :Install Vim or modify the text editor
+#bash_version   :4.1.5(1)-release
+
+EDITOR="vim + "
+PULL="git pull"
+ADD="git add *"
+COMMIT="git commit"
+PUSH="git push"
+DIARY_PATH="${HOME}/diary"
+FORMAT=`date +"%Y_%m_%d"`
+VALID_PROJECT_NAME='^0-9a-zA-Z+$'
+EXTENSION="md"
+TEMP_FILE="._tmp_file_markdown.html"
+CSS_STYLE="style.css"
+EXPLORER="sensible-browser"
+
+function show_usage() {
+    echo "Usage: $0 [<diary_name>]" 1>&2;
+    exit 1;
+}
+
+function show_help() {
+    echo "Help usage: $0 [-h:-?:-e:-ls:-lsl:-push:-pull: -s <sentence>] <diary_name>" 1>&2;
+    echo " -h|?     Show the help"
+    echo " -ls      Show the name of all the diaries"
+    echo " -lsl     List the name of all the diaries"
+    echo " -e, --explore       Open a web-browser with the content of the specified diary"
+    echo " -s, --search     Searches the following sentence in the specified diary (or in all the diaries)"
+    echo " -push    Push all the changes to a repository"
+    echo " -pull    Pull all the changes from a repository"
+    exit 1;
+}
+
+# TODO: find correct regular expresion
+# for some reason I do not get + and ? to work
+function validate_project_name() {
+    if [[ $1 =~ [$VALID_PROJECT_NAME] ]]; then
+        return 1
+    elif [[ $1 == '' ]]; then
+        return 1
+    fi
+    return 0
+}
+
+function explore() {
+    diary=$1
+    cd $diary
+    rm "$TEMP_FILE"
+    cp "../$CSS_STYLE" $TEMP_FILE
+
+    for f in `ls ./*."$EXTENSION"`
+    do
+        echo "Extracting file $f"
+        echo "<h1>$f</h1>" >> "$TEMP_FILE"
+        markdown $f >> "$TEMP_FILE"
+    done
+
+    $EXPLORER "$TEMP_FILE"
+}
+
+# First time using diary
+if ! [ -d "${DIARY_PATH}" ]; then
+    mkdir "${DIARY_PATH}"
+fi
+
+# Go to diaries path
+cd ${DIARY_PATH}
+
+while [[ $# -gt 0 ]]; do
+    opt="$1"
+    shift;
+    case "$opt" in
+        "-ls")
+            ls
+            exit 0
+            ;;
+        "-lsl")
+            ls -l
+            exit 0
+            ;;
+        "-pull")
+            $PULL
+            exit 0
+            ;;
+        "-push")
+            $ADD
+            $COMMIT
+            $PUSH
+            exit 0
+            ;;
+        "-h"|"-?"|"--help")
+            show_help
+            exit 0
+            ;;
+        "-s"|"--search")
+            search_sentence=$1
+            shift;
+            ;;
+        "-e"|"--explore")
+            explore $1
+            exit 0
+            ;;
+
+        *)
+            if [[ $# -eq 0 ]]; then
+                diary=${opt}
+            else
+                show_usage
+                exit 0
+            fi
+            ;;
+    esac
+done
+
+if ! [[ -z "$search_sentence" ]]; then
+    if ! validate_project_name $diary; then
+        grep -r "${search_sentence}" ./*/*.${EXTENSION}
+    else
+        grep -r "${search_sentence}" ${diary}/*.${EXTENSION}
+    fi
+    exit 0
+fi
+
+if ! validate_project_name $diary; then
+    echo "Project name can only contain :${VALID_PROJECT_NAME}"
+    exit 0
+fi
+
+# If the diary is new, create it
+if ! [ -d "$diary" ]; then
+    mkdir "${diary}"
+fi
+
+cd $diary
+
+#if [[ -z "$DAY" ]]; then
+#    FORMAT=$DAY
+#fi
+
+FILENAME=${diary}\_${FORMAT}.${EXTENSION}
+
+${EDITOR}  ${FILENAME}
