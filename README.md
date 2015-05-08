@@ -64,7 +64,7 @@ diary -lsl
 Search one sentence
 -------------------
 
-If the name of the diary is not specified the sentences is searched into all
+If the name of the diary is not specified the sentence is searched in all
 the diaries
 
 ```sh
