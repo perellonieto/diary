@@ -20,6 +20,8 @@ There is NO WARRANTY, to the extent permitted by law.
 Written by Miquel Perello Nieto."
 
 usage="Usage: $0 [OPTION]... [DIARY_NAME]
+Opens todays page of the DIARY_NAME diary or performs any of the specified
+options.
 
     OPTIONs
 
