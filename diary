@@ -29,9 +29,9 @@ pre {
     background-color: lightgray;
     margin-left: 2em;
 }
+</style>
 '
 
-</style>
 function show_usage() {
     echo "Usage: $0 [<diary_name>]" 1>&2;
     exit 1;
@@ -64,7 +64,7 @@ function explore() {
     diary=$1
     cd $diary
     rm "$TEMP_FILE"
-    cat ${CSS_STYLE} > $TEMP_FILE
+    echo ${CSS_STYLE} > $TEMP_FILE
 
     for f in `ls ./*."$EXTENSION"`
     do
