@@ -1,27 +1,56 @@
 #!/bin/bash
-#title          :diary
-#description    :Script to manage diary annotations of different projects
-#                or personal notes. It allows to search sentences in all the
-#                diaries, visualize in a web-browser, and maintain a control
-#                version.
-#author         :Miquel Perello Nieto
-#date           :20150507
-#version        :0.4
-#usage          :diary nameofthediary
-#notes          :Install Vim or modify the text editor
-#bash_version   :4.1.5(1)-release
+## title          :diary
+## description    :Script to manage diary annotations of different projects
+##                 or personal notes. It allows to search sentences in all the
+##                 diaries, visualize in a web-browser, and maintain a control
+##                 version.
+## author         :Miquel Perello Nieto
+## date           :20150507
+## version        :0.5
+## usage          :diary nameofthediary
+## notes          :Install Vim or modify the text editor
+## bash_version   :4.1.5(1)-release
 
+version="diary 0.5
+Copyright (C) 2015
+This is free software.  You may redistribute copies of it under the terms of
+the GNU General Public License <http://www.gnu.org/licenses/gpl.html>.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by Miquel Perello Nieto."
+
+usage="Usage: $0 [OPTION]... [DIARY_NAME]
+
+    OPTIONs
+
+     -h, --help       Show the help
+     -v, --version    Show the actual version information
+     -ls              Show the name of all the diaries
+     -lsl             List the name of all the diaries
+     -e, --explore    Open a web-browser with the content of the specified diary
+     -s, --search     Searches the following sentence in the specified diary
+                      (or in all the diaries if the diary name is ommited)
+     -push            Push all the changes to a repository
+     -pull            Pull all the changes from a repository
+
+Report bugs to <bugs-diary@perellonieto.com>."
+
+#=============================
+# CONFIGURATION VARIABLES
+#
+DIARY_PATH="${HOME}/diary"
 EDITOR="vim + "
-PULL="git pull"
+EXPLORER="sensible-browser"
+
 ADD="git add *"
 COMMIT="git commit"
+PULL="git pull"
 PUSH="git push"
-DIARY_PATH="${HOME}/diary"
+
 FORMAT=`date +"%Y_%m_%d"`
 VALID_PROJECT_NAME='^0-9a-zA-Z+$'
 EXTENSION="md"
 TEMP_FILE="._tmp_file_markdown.html"
-EXPLORER="sensible-browser"
 
 CSS_STYLE='
 <style type="text/css">
@@ -36,22 +65,9 @@ HTML_HEADER="<html><head>${CSS_STYLE}</head><body>"
 
 HTML_FOOTER='</body></html>'
 
-function show_usage() {
-    echo "Usage: $0 [<diary_name>]" 1>&2;
-    exit 1;
-}
-
-function show_help() {
-    echo "Help usage: $0 [-h:-?:-e:-ls:-lsl:-push:-pull: -s <sentence>] <diary_name>" 1>&2;
-    echo " -h|?     Show the help"
-    echo " -ls      Show the name of all the diaries"
-    echo " -lsl     List the name of all the diaries"
-    echo " -e, --explore       Open a web-browser with the content of the specified diary"
-    echo " -s, --search     Searches the following sentence in the specified diary (or in all the diaries)"
-    echo " -push    Push all the changes to a repository"
-    echo " -pull    Pull all the changes from a repository"
-    exit 1;
-}
+#=============================
+# AUXILIAR FUNCTIONS
+#
 
 # TODO: find correct regular expresion
 # for some reason I do not get + and ? to work
@@ -82,6 +98,10 @@ function explore() {
     $EXPLORER "${TEMP_FILE}"
 }
 
+#=============================
+# MAIN
+#
+
 # First time using diary
 if ! [ -d "${DIARY_PATH}" ]; then
     mkdir "${DIARY_PATH}"
@@ -92,47 +112,23 @@ cd ${DIARY_PATH}
 
 while [[ $# -gt 0 ]]; do
     opt="$1"
-    shift;
+    shift
     case "$opt" in
-        "-ls")
-            ls
-            exit 0
-            ;;
-        "-lsl")
-            ls -l
-            exit 0
-            ;;
-        "-pull")
-            $PULL
-            exit 0
-            ;;
-        "-push")
-            $ADD
-            $COMMIT
-            $PUSH
-            exit 0
-            ;;
-        "-h"|"-?"|"--help")
-            show_help
-            exit 0
-            ;;
-        "-s"|"--search")
-            search_sentence=$1
-            shift;
-            ;;
-        "-e"|"--explore")
-            explore $1
-            exit 0
-            ;;
-
-        *)
-            if [[ $# -eq 0 ]]; then
-                diary=${opt}
-            else
-                show_usage
-                exit 0
-            fi
-            ;;
+    -h|--help) printf '%s\n' "$usage" || exit 2; exit;;
+    -v|--version) printf '%s\n' "$version" || exit 2; exit;;
+    -ls) ls || exit 2; exit;;
+    -lsl) ls -l || exit 2; exit;;
+    -s|--search) search_sentence=$1; shift;;
+    -e|--explore) explore $1; exit;;
+    -pull) $PULL || exit 2; exit;;
+    -push) $ADD; $COMMIT; $PUSH; exit;;
+    *)
+      if [[ $# -eq 0 ]]; then
+          diary=${opt}
+      else
+          printf '%s\n' "$usage" || exit 2; exit;
+      fi
+      ;;
     esac
 done
 
