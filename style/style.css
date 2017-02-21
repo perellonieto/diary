@@ -1,0 +1,70 @@
+body {
+    color: lightgray;
+    background-color: DarkSlateGray;
+    font-family: "Arial";
+    font-size: 16px;
+}
+
+a {
+    color: aquamarine;
+}
+
+pre {
+    width: 800px;
+    background-color: #111122;
+    /*background-color: #EEEEEE;*/
+    margin-left: 4ex;
+    padding: 1em;
+    border-radius: 5px;
+}
+
+code {
+    font-family: "Courier New", Courier, monospace, sans-serif;
+    line-height: 1.6em;
+    font-size: 14px;
+}
+
+td, th {
+    border: 1px solid lightgray;
+    text-align: center;
+}
+
+th {
+    background: lightblue;
+    border-color: white;
+}
+
+nav {
+    float: right;
+    /*background: lightgray;
+    border-color: gray;*/
+    padding: 8px;
+    background-color: #111122;
+    border-radius : 10px;
+}
+
+nav ul {
+    list-style-type : none;
+    margin: 0;
+    padding: 0;
+    border-radius: 10px;
+}
+
+nav li a {
+    display: block;
+    text-decoration: none;
+    padding: 4px 16px;
+    color: aquamarine;
+    background-color: DarkSlateGray;
+}
+
+nav li a:hover {
+    color: black;
+    background-color: lightblue;
+}
+
+h1.filename {
+    color: #111122;
+    background-color: lightblue;
+    border-radius: 7px;
+}

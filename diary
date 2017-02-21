@@ -5,13 +5,13 @@
 ##                 diaries, visualize in a web-browser, and maintain a control
 ##                 version.
 ## author         :Miquel Perello Nieto
-## date           :20150507
-## version        :0.5
+## date           :20170221
+## version        :0.6
 ## usage          :diary nameofthediary
 ## notes          :Install Vim or modify the text editor
 ## bash_version   :4.1.5(1)-release
 
-version="diary 0.5
+version="diary 0.6
 Copyright (C) 2015
 This is free software.  You may redistribute copies of it under the terms of
 the GNU General Public License <http://www.gnu.org/licenses/gpl.html>.
@@ -37,6 +37,8 @@ options.
 
 Report bugs to <bugs-diary@perellonieto.com>."
 
+# TODO add Jekyll support
+
 #=============================
 # CONFIGURATION VARIABLES
 #
@@ -51,21 +53,51 @@ PUSH="git push"
 
 FORMAT=`date +"%Y_%m_%d"`
 VALID_PROJECT_NAME='^0-9a-zA-Z+$'
-EXTENSION="md"
+EXTENSION="markdown"
 TEMP_FILE="._tmp_file_markdown.html"
+CSS_STYLE="style.css"
 
-CSS_STYLE='
-<style type="text/css">
-pre {
-    background-color: lightgray;
-    margin-left: 2em;
-}
-</style>
-'
+read -r -d '' HTML_HEAD <<-'EOF'
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//E " "http://www.w3.org/TR/html4/strict.dt ">
+<html>
+<head>
+    <title>Diary</title>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type">
 
-HTML_HEADER="<html><head>${CSS_STYLE}</head><body>"
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <script src="../jquery-3.1.1.min.js"></script>
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+    }
+    });
+    </script>
+    <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+    <script type="text/javascript" async src="../functions.js">
+    </script>
+</head>
+<body>
 
-HTML_FOOTER='</body></html>'
+<nav role="navigation" class="table-of-contents">
+  <h2>Table of Contents:</h2>
+  <ul>
+    <li><a href="#TODOs">TODOs</a></li>
+  </ul>
+</nav>
+EOF
+
+# With an internet connection is possible to use the mathjax library online.
+# Just substitute the upper line for this one
+#    <script type="text/javascript" async src="../MathJax.js?config=TeX-MML-AM_CHTML">
+#   <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+
+read -r -d '' HTML_FOOTER <<-'EOF'
+</body>
+</html>
+EOF
 
 #=============================
 # AUXILIAR FUNCTIONS
@@ -84,20 +116,26 @@ function validate_project_name() {
 
 function explore() {
     diary=$1
-    cd $diary
-    rm "$TEMP_FILE"
-    echo ${HTML_HEADER} > ${TEMP_FILE}
+    cd ${diary}
+    rm ${TEMP_FILE}
+    echo "${HTML_HEAD}" > ${TEMP_FILE}
 
-    for f in `ls ./*."${EXTENSION}"`
+    echo "<h1 id=\"TODOs\">TODOs</h1>" >> "$TEMP_FILE"
+    grep --no-filename "\*\*TODO\*\*" ./*.${EXTENSION} | markdown >> ${TEMP_FILE}
+    #cp "../$CSS_STYLE" $TEMP_FILE
+
+    for FILENAME in `ls ./*.${EXTENSION}`
     do
-        echo "Extracting file $f"
-        echo "<h1>$f</h1>" >> "$TEMP_FILE"
-        markdown $f >> "$TEMP_FILE"
+        echo "Extracting file $FILENAME"
+        H1TITLE=$(basename $FILENAME)
+        echo "<h1 class='filename' id=\"${H1TITLE}\">${H1TITLE}</h1>" >> ${TEMP_FILE}
+        markdown $FILENAME >> ${TEMP_FILE}
     done
 
-    echo ${HTML_FOOTER} >> ${TEMP_FILE}
-
-    $EXPLORER "${TEMP_FILE}"
+    echo "${HTML_FOOTER}" >> ${TEMP_FILE}
+    # TODO look into pandoc
+    #pandoc --to='html5' --output="$TEMP_FILE" $FILENAME
+    $EXPLORER ${TEMP_FILE}
 }
 
 #=============================
@@ -116,7 +154,7 @@ while [[ $# -gt 0 ]]; do
     opt="$1"
     shift
     case "$opt" in
-    -h|--help) printf '%s\n' "$usage" || exit 2; exit;;
+    -h|-\?|--help) printf '%s\n' "${usage}" || exit 2; exit;;
     -v|--version) printf '%s\n' "$version" || exit 2; exit;;
     -ls) ls || exit 2; exit;;
     -lsl) ls -l || exit 2; exit;;
@@ -128,7 +166,7 @@ while [[ $# -gt 0 ]]; do
       if [[ $# -eq 0 ]]; then
           diary=${opt}
       else
-          printf '%s\n' "$usage" || exit 2; exit;
+          printf '%s\n' "${usage}" || exit 2; exit;
       fi
       ;;
     esac
