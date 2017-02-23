@@ -121,7 +121,8 @@ function explore() {
     echo "${HTML_HEAD}" > ${TEMP_FILE}
 
     echo "<h1 id=\"TODOs\">TODOs</h1>" >> "$TEMP_FILE"
-    grep --no-filename "\*\*TODO\*\*" ./*.${EXTENSION} | markdown >> ${TEMP_FILE}
+    grep --no-filename "\[ \] \*\*TODO\*\*" ./*.${EXTENSION} | markdown >> ${TEMP_FILE}
+    grep --no-filename "\[x\] \*\*TODO\*\*" ./*.${EXTENSION} | markdown >> ${TEMP_FILE}
     #cp "../$CSS_STYLE" $TEMP_FILE
 
     for FILENAME in `ls ./*.${EXTENSION}`
