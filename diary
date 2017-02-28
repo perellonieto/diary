@@ -129,6 +129,7 @@ function explore() {
     do
         echo "Extracting file $FILENAME"
         H1TITLE=$(basename $FILENAME)
+        H1TITLE="${H1TITLE%.*}"
         echo "<h1 class='filename' id=\"${H1TITLE}\">${H1TITLE}</h1>" >> ${TEMP_FILE}
         markdown $FILENAME >> ${TEMP_FILE}
     done
