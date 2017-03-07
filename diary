@@ -121,8 +121,9 @@ function explore() {
     echo "${HTML_HEAD}" > ${TEMP_FILE}
 
     echo "<h1 id=\"TODOs\">TODOs</h1>" >> "$TEMP_FILE"
-    grep --no-filename "\[ \] \*\*TODO\*\*" ./*.${EXTENSION} | markdown >> ${TEMP_FILE}
-    grep --no-filename "\[x\] \*\*TODO\*\*" ./*.${EXTENSION} | markdown >> ${TEMP_FILE}
+    grep "\[ \] \*\*TODO\*\*" ./*.${EXTENSION} | \
+         awk -F':' '{print $2, "[#](#"$1")";}' | \
+         markdown >> ${TEMP_FILE}
     #cp "../$CSS_STYLE" $TEMP_FILE
 
     for FILENAME in `ls ./*.${EXTENSION}`
@@ -130,14 +131,14 @@ function explore() {
         echo "Extracting file $FILENAME"
         H1TITLE=$(basename $FILENAME)
         H1TITLE="${H1TITLE%.*}"
-        echo "<h1 class='filename' id=\"${H1TITLE}\">${H1TITLE}</h1>" >> ${TEMP_FILE}
+        echo "<a name=\"${FILENAME}\"><h1 class='filename' id=\"${H1TITLE}\">${H1TITLE}</h1> </a>" >> ${TEMP_FILE}
         markdown $FILENAME >> ${TEMP_FILE}
     done
 
     echo "${HTML_FOOTER}" >> ${TEMP_FILE}
     # TODO look into pandoc
     #pandoc --to='html5' --output="$TEMP_FILE" $FILENAME
-    $EXPLORER ${TEMP_FILE}
+    $EXPLORER ${TEMP_FILE} &
 }
 
 #=============================
