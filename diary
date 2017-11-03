@@ -89,7 +89,7 @@ read -r -d '' HTML_HEAD <<-'EOF'
 </head>
 <body>
 
-<nav role="navigation" class="table-of-contents">
+<nav role="navigation" class="table-of-contents" onmouseenter="showToC();" onmouseleave="hideToC();">
   <h2>Table of Contents:</h2>
   <ul>
     <li><a href="#TODOs">TODOs</a></li>
@@ -136,9 +136,9 @@ function explore() {
     #cp "../_html/$CSS_STYLE" $TEMP_FILE
 
     if [ "$YEAR" == "all" ]; then
-        FILENAME_LIST=`ls ./*.${EXTENSION}`
+        FILENAME_LIST=`ls -r ./*.${EXTENSION}`
     else
-        FILENAME_LIST=`ls ./*.${EXTENSION} | grep ${YEAR}`
+        FILENAME_LIST=`ls -r ./*.${EXTENSION} | grep ${YEAR}`
     fi
 
     for FILENAME in $FILENAME_LIST

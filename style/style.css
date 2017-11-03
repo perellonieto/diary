@@ -1,18 +1,21 @@
 body {
-    color: lightgray;
-    background-color: DarkSlateGray;
+    /*color: lightgray;
+    background-color: DarkSlateGray;*/
+    color: black;
+    background-color: white;
     font-family: "Arial";
     font-size: 16px;
 }
 
 a {
-    color: aquamarine;
+    /*color: aquamarine;*/
+    color: darkblue;
 }
 
 pre {
-    width: 800px;
-    background-color: #111122;
-    /*background-color: #EEEEEE;*/
+    width: 95%;
+    /*background-color: #111122;*/
+    background-color: #EEEEEE;
     margin-left: 4ex;
     padding: 1em;
     border-radius: 5px;
@@ -24,33 +27,54 @@ code {
     font-size: 14px;
 }
 
+table {
+    width: 100%;
+}
+
+td img{
+    display: block;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 td, th {
+    color: black;
     border: 1px solid lightgray;
-    text-align: center;
 }
 
 th {
+    color: black;
     background: lightblue;
     border-color: white;
 }
 
-nav {
-    float: right;
+.table-of-contents {
+    /*float: right;*/
+    position: fixed;
+    top: 0;
+    right: 0;
+    color: white;
     /*background: lightgray;
     border-color: gray;*/
     padding: 8px;
     background-color: #111122;
     border-radius : 10px;
+    font-size: 10px;
 }
 
-nav ul {
+.table-of-contents h2{
+    text-align: right;
+}
+
+.table-of-contents ul {
     list-style-type : none;
     margin: 0;
     padding: 0;
-    border-radius: 10px;
+    border-radius: 6px;
 }
 
-nav li a {
+.table-of-contents li a {
     display: block;
     text-decoration: none;
     padding: 4px 16px;
@@ -58,13 +82,19 @@ nav li a {
     background-color: DarkSlateGray;
 }
 
-nav li a:hover {
+.table-of-contents li a:hover {
     color: black;
     background-color: lightblue;
 }
 
-h1.filename {
+h1 {
     color: #111122;
     background-color: lightblue;
+    border-radius: 7px;
+}
+
+h1.filename {
+    color: #111122;
+    background-color: lightgrey;
     border-radius: 7px;
 }
