@@ -29,6 +29,7 @@ options.
      -v, --version    Show the actual version information
      -ls              Show the name of all the diaries
      -lsl             List the name of all the diaries
+     -lt              List available templates
      -e, --explore    Open a web-browser with the content of the specified diary
      -s, --search     Searches the following sentence in the specified diary
                       (or in all the diaries if the diary name is ommited)
@@ -47,6 +48,7 @@ Report bugs to <bugs-diary@perellonieto.com>."
 #
 DIARY_PATH="${HOME}/Dropbox/diary"
 EDITOR="vim + "
+# EDITOR="remarkable"
 EXPLORER="sensible-browser"
 
 ADD="git add *"
@@ -92,7 +94,6 @@ read -r -d '' HTML_HEAD <<-'EOF'
 <nav role="navigation" class="table-of-contents" onmouseenter="showToC();" onmouseleave="hideToC();">
   <h2>Table of Contents:</h2>
   <ul>
-    <li><a href="#TODOs">TODOs</a></li>
   </ul>
 </nav>
 EOF
@@ -129,17 +130,21 @@ function explore() {
     rm ${TEMP_FILE}
     echo "${HTML_HEAD}" > ${TEMP_FILE}
 
-    echo "<h1 id=\"TODOs\">TODOs</h1>" >> "$TEMP_FILE"
-    grep "\[ \] \*\*TODO\*\*" ./*.${EXTENSION} | \
-         awk -F':' '{print $2, "[#](#"$1")";}' | \
-         $MDTOHTML >> ${TEMP_FILE}
-    #cp "../_html/$CSS_STYLE" $TEMP_FILE
-
     if [ "$YEAR" == "all" ]; then
         FILENAME_LIST=`ls -r ./*.${EXTENSION}`
     else
         FILENAME_LIST=`ls -r ./*.${EXTENSION} | grep ${YEAR}`
     fi
+
+    echo "<h1 id=\"TODOs\">TODOs</h1>" >> "$TEMP_FILE"
+    # If filename list only contains one file, grep will not print the filename
+    # before the line. To solve that it is enough to add an additional file
+    # /dev/null that makes it believe there are multiple files
+    grep "\[ \] \*\*TODO\*\*" ${FILENAME_LIST} /dev/null | \
+         awk -F':' '{print $2, "[#](#"$1")";}' | \
+         $MDTOHTML >> ${TEMP_FILE}
+    #cp "../_html/$CSS_STYLE" $TEMP_FILE
+
 
     for FILENAME in $FILENAME_LIST
     do
@@ -183,6 +188,7 @@ while [[ $# -gt 0 ]]; do
     -v|--version) printf '%s\n' "$version" || exit 2; exit;;
     -ls) ls | grep -v ^_ || exit 2; exit;;
     -lsl) ls | grep -v ^_ || exit 2; exit;;
+    -lt) ls _templates/ | sed -e 's/.markdown//g' || exit 2; exit;;
     -s|--search) search_sentence=$1; shift;;
     -e|--explore) NOTEBOOK=$1; shift;;
     -y|--year) YEAR=$1; shift;;
