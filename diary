@@ -243,7 +243,9 @@ FILENAME=${diary}\_${FORMAT}.${EXTENSION}
 if ! [[ -z "$TEMPLATE" ]]; then
     TEMPLATE_FILE="../_templates/$TEMPLATE.markdown"
     if [ -f "$TEMPLATE_FILE" ]; then
-        cat "../_templates/$TEMPLATE.markdown" >> $FILENAME
+        DATETIME=`date +"%H:%M, %A %B %d, %Y"`
+        cat "../_templates/$TEMPLATE.markdown" | \
+            sed -e "s/{DATETIME}/${DATETIME}/g" >> $FILENAME
     else
         echo "Template $TEMPLATE does not exist. Choose one of the following:"
         ls "../_templates/" | sed 's/.markdown//'
