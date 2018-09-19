@@ -34,6 +34,7 @@ options.
      -s, --search     Searches the following sentence in the specified diary
                       (or in all the diaries if the diary name is ommited)
      -y, --year       all or year (default current year)
+     --last           Number of pages from the end
      -t, --todo       Show all the TODO tags
      -m, --template   Appends a template to the current day
      -push            Push all the changes to a repository
@@ -63,6 +64,7 @@ TEMP_FILE="._tmp_file_markdown.html"
 CSS_STYLE="style.css"
 MDTOHTML='pandoc'
 YEAR=`date +%Y`
+LAST="all"
 
 NOTEBOOK=''
 TEMPLATE=''
@@ -126,11 +128,14 @@ function validate_project_name() {
 function explore() {
     diary=$1
     YEAR=$2
+    LAST=$3
     cd ${diary}
     rm ${TEMP_FILE}
     echo "${HTML_HEAD}" > ${TEMP_FILE}
 
-    if [ "$YEAR" == "all" ]; then
+    if [ "$LAST" != "all" ]; then
+        FILENAME_LIST=`ls -r ./*.${EXTENSION} | head "-${LAST}"`
+    elif [ "$YEAR" == "all" ]; then
         FILENAME_LIST=`ls -r ./*.${EXTENSION}`
     else
         FILENAME_LIST=`ls -r ./*.${EXTENSION} | grep ${YEAR}`
@@ -192,6 +197,7 @@ while [[ $# -gt 0 ]]; do
     -s|--search) search_sentence=$1; shift;;
     -e|--explore) NOTEBOOK=$1; shift;;
     -y|--year) YEAR=$1; shift;;
+    --last) LAST=$1; shift;;
     -t|--todo) echo_todos; exit;;
     -m|--template) TEMPLATE=$1; shift;;
     -pull) $PULL || exit 2; exit;;
@@ -207,7 +213,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 if ! [[ -z "$NOTEBOOK" ]]; then
-    explore $NOTEBOOK $YEAR
+    explore $NOTEBOOK $YEAR $LAST
     $EXPLORER ${TEMP_FILE} &
     exit 2; exit;
 fi
