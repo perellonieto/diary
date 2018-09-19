@@ -35,7 +35,29 @@ EXPLORER="firefox"
 Show the help
 -------------
 ```sh
-diary --help
+$ diary --help
+Usage: /home/maikel/bin/diary [OPTION]... [DIARY_NAME]
+Opens todays page of the DIARY_NAME diary or performs any of the specified
+options.
+
+    OPTIONs
+
+     -h, --help       Show the help
+     -v, --version    Show the actual version information
+     -ls              Show the name of all the diaries
+     -lsl             List the name of all the diaries
+     -lt              List available templates
+     -e, --explore    Open a web-browser with the content of the specified diary
+     -s, --search     Searches the following sentence in the specified diary
+                      (or in all the diaries if the diary name is ommited)
+     -y, --year       all or year (default current year)
+     --last           Number of pages from the end
+     -t, --todo       Show all the TODO tags
+     -m, --template   Appends a template to the current day
+     -push            Push all the changes to a repository
+     -pull            Pull all the changes from a repository
+
+Report bugs to <bugs-diary@perellonieto.com>.
 ```
 
 Create or open a diary
