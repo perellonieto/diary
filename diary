@@ -62,7 +62,7 @@ VALID_PROJECT_NAME='^0-9a-zA-Z+$'
 EXTENSION="markdown"
 TEMP_FILE="._tmp_file_markdown.html"
 CSS_STYLE="style.css"
-MDTOHTML='pandoc'
+MDTOHTML="pandoc --filter ${HOME}/bin/graphviz.py --smart --mathjax --highlight-style pygments --columns=200"
 YEAR=`date +%Y`
 LAST="all"
 
@@ -86,7 +86,7 @@ read -r -d '' HTML_HEAD <<-'EOF'
     }
     });
     </script>
-    <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
     </script>
     <script type="text/javascript" async src="../_html/functions.js">
     </script>
@@ -170,7 +170,8 @@ function explore() {
 }
 
 function echo_todos() {
-    grep "\[ \] \*\*TODO\*\*" `find ./ -type f -name *.markdown`
+    grep "\[ \] \*\*TODO\*\*" `find ./${NOTEBOOK} -type f -name *.${EXTENSION} | sort `
+
 }
 
 #=============================
@@ -193,12 +194,12 @@ while [[ $# -gt 0 ]]; do
     -v|--version) printf '%s\n' "$version" || exit 2; exit;;
     -ls) ls | grep -v ^_ || exit 2; exit;;
     -lsl) ls | grep -v ^_ || exit 2; exit;;
-    -lt) ls _templates/ | sed -e 's/.markdown//g' || exit 2; exit;;
+    -lt) ls _templates/ | sed -e 's/.${EXTENSION}//g' || exit 2; exit;;
     -s|--search) search_sentence=$1; shift;;
     -e|--explore) NOTEBOOK=$1; shift;;
     -y|--year) YEAR=$1; shift;;
     --last) LAST=$1; shift;;
-    -t|--todo) echo_todos; exit;;
+    -t|--todo) NOTEBOOK=$1; echo_todos; exit;;
     -m|--template) TEMPLATE=$1; shift;;
     -pull) $PULL || exit 2; exit;;
     -push) $ADD; $COMMIT; $PUSH; exit;;
@@ -247,14 +248,14 @@ cd $diary
 FILENAME=${diary}\_${FORMAT}.${EXTENSION}
 
 if ! [[ -z "$TEMPLATE" ]]; then
-    TEMPLATE_FILE="../_templates/$TEMPLATE.markdown"
+    TEMPLATE_FILE="../_templates/$TEMPLATE.${EXTENSION}"
     if [ -f "$TEMPLATE_FILE" ]; then
         DATETIME=`date +"%H:%M, %A %B %d, %Y"`
-        cat "../_templates/$TEMPLATE.markdown" | \
+        cat "../_templates/$TEMPLATE.${EXTENSION}" | \
             sed -e "s/{DATETIME}/${DATETIME}/g" >> $FILENAME
     else
         echo "Template $TEMPLATE does not exist. Choose one of the following:"
-        ls "../_templates/" | sed 's/.markdown//'
+        ls "../_templates/" | sed 's/.${EXTENSION}//'
         exit 2; exit;
     fi
 fi
